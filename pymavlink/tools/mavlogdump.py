@@ -164,7 +164,7 @@ while True:
 
         # Prepare the message as a single object with 'meta' and 'data' keys holding
         # the message's metadata and actual data respectively.
-        outMsg = {"meta": {"type": m.get_type(), "timestamp": timestamp}, "data": data}
+        outMsg = {"meta": {"type": m.get_type(), "timestamp": timestamp, "srcSystem": m.get_srcSystem(), "srcComponent": m.get_srcComponent() }, "data": data}
 
         # Now print out this object with stringified properly.
         print(json.dumps(outMsg))
