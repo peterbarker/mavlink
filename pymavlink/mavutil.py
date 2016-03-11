@@ -8,6 +8,7 @@ Released under GNU GPL version 3 or later
 
 import socket, math, struct, time, os, fnmatch, array, sys, errno
 import select, mavexpression
+import Queue
 
 # adding these extra imports allows pymavlink to be used directly with pyinstaller
 # without having complex spec files. To allow for installs that don't have ardupilotmega
@@ -149,6 +150,7 @@ class mavfile(object):
         self.mav_count = 0
         self.stop_on_EOF = False
         self.portdead = False
+        self.source_listeners = dict() # a source is a sysid/compid pair
 
     def auto_mavlink_version(self, buf):
         '''auto-switch mavlink protocol version'''
@@ -198,6 +200,16 @@ class mavfile(object):
         '''default write method'''
         raise RuntimeError('no write() method supplied')
 
+    def listener_add(self, system_id, component_id, listener):
+        '''listener gets all messages from system_id/component_id'''
+        if system_id not in self.source_listeners:
+            self.source_listeners[system_id] = dict()
+        if component_id not in self.source_listeners[system_id]:
+            self.source_listeners[system_id][component_id] = dict()
+        self.source_listeners[system_id][component_id][str(listener)] = listener
+
+    def listener_remove(self, system_id, component_id, listener):
+        del self.source_listeners[system_id][component_id][str(listener)]
 
     def select(self, timeout):
         '''wait for up to timeout seconds for more data'''
@@ -290,6 +302,14 @@ class mavfile(object):
             # change to link_id from incoming packet
             self.mav.signing.link_id = msg.get_link_id()
 
+        # pass this message along to any source listeners:
+        if msg.get_srcSystem() in self.source_listeners:
+            # First those listening to an entire vehicle:
+            for comp in [0, msg.get_srcComponent()]:
+                if comp in self.source_listeners[msg.get_srcSystem()]:
+                    listeners = self.source_listeners[msg.get_srcSystem()][comp].values()
+                    for listener in listeners:
+                        listener.to_source_put(msg)
 
     def packet_loss(self):
         '''packet loss as a percentage'''
@@ -1133,6 +1153,7 @@ class mavmemlog(mavfile):
         self.percent = 0
         self.messages = {}
 
+
 class mavchildexec(mavfile):
     '''a MAVLink child processes reader/writer'''
     def __init__(self, filename, source_system=255, use_native=default_native):
@@ -1665,6 +1686,106 @@ class MavlinkSerialPort():
                                                  0, [0]*70)
                 self.flushInput()
                 self.debug("Changed baudrate %u" % self.baudrate)
+
+class mavsource(mavfile):
+    '''state, and a stream of messages for a single vehicle or component'''
+    def __init__(self, mav, system_id, component_id):
+        mavfile.__init__(self, None, 'vehicle')
+        self.from_source = Queue.Queue()
+        self.to_source = Queue.Queue()
+        self.system = system_id
+        self.component = component_id
+        self.mav = mav
+        self.messages = {}
+        mav.listener_add(system_id, component_id, self)
+
+    def close(self):
+        ''' notify listeners?'''
+        pass
+
+    def mode_mapping(self):
+        '''return dictionary mapping mode names to numbers, or None if unknown'''
+        mav_type = self.field('HEARTBEAT', 'type', self.mav_type)
+        if mav_type is None:
+            return None
+        map = None
+        if mav_type in [mavlink.MAV_TYPE_QUADROTOR,
+                        mavlink.MAV_TYPE_HELICOPTER,
+                        mavlink.MAV_TYPE_HEXAROTOR,
+                        mavlink.MAV_TYPE_OCTOROTOR,
+                        mavlink.MAV_TYPE_TRICOPTER]:
+            map = mode_mapping_acm
+        if mav_type == mavlink.MAV_TYPE_FIXED_WING:
+            map = mode_mapping_apm
+        if mav_type == mavlink.MAV_TYPE_GROUND_ROVER:
+            map = mode_mapping_rover
+        if mav_type == mavlink.MAV_TYPE_ANTENNA_TRACKER:
+            map = mode_mapping_tracker
+        if map is None:
+            return None
+        inv_map = dict((a, b) for (b, a) in list(map.items()))
+        return inv_map
+
+    def field(self, type, field, default=None):
+        '''convenient function for returning an arbitrary MAVLink
+           field with a default'''
+        if not type in self.messages:
+            return default
+        return getattr(self.messages[type], field, default)
+
+    def to_source_put(self, msg):
+        type = msg.get_type()
+        self.messages[type] = msg
+        self.to_source.put(msg)
+
+    def recv_msg(self):
+        '''called by connection to fetch messages for it to send on'''
+        msg = from_source.get()
+        return msg
+
+    def set_mode(self, mode):
+        '''enter arbitrary mode'''
+        if isinstance(mode, str):
+            map = self.mode_mapping()
+            if map is None or mode not in map:
+                print("Unknown mode '%s'" % mode)
+                return
+            mode = map[mode]
+        self.mav.set_mode_send(self.system,
+                               mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+                               mode)
+
+    def param_fetch_all(self):
+        '''send a message to a target system requesting it send params'''
+        if time.time() - getattr(self, 'param_fetch_start', 0) < 2.0:
+            # don't fetch too often
+            return
+        self.param_fetch_start = time.time()
+        self.param_fetch_in_progress = True
+        self.mav.param_request_list_send(self.system, self.component)
+
+    def waypoint_clear_all_send(self):
+        if self.mavlink10():
+            self.mav.mission_clear_all_send(self.system, self.component)
+        else:
+            self.mav.waypoint_clear_all_send(self.system, self.component)
+
+    def send_wp(self, wp):
+        '''send a wp message to a target system'''
+        wp.source_system = self.system
+        wp.target_component = self.component
+        self.mav.send(wp)
+
+    def waypoint_count_send(self, seq):
+        if self.mavlink10():
+            self.mav.mission_count_send(self.system, self.component, seq)
+        else:
+            self.mav.waypoint_count_send(self.system, self.component, seq)
+
+    def send_rc_overrides(self, overrides):
+        self.mav.rc_channels_override_send(self.target_system,
+                                           self.target_component,
+                                           *overrides)
 
 if __name__ == '__main__':
         serial_list = auto_detect_serial(preferred_list=['*FTDI*',"*Arduino_Mega_2560*", "*3D_Robotics*", "*USB_to_UART*", '*PX4*', '*FMU*'])
