@@ -194,6 +194,8 @@ class MAVLink_message(object):
         mav.signing.timestamp += 1
 
     def pack(self, mav, crc_extra, payload, force_mavlink1=False):
+        srcSystem = self._header.srcSystem or mav.srcSystem
+        srcComponent = self._header.srcComponent or mav.srcComponent
         plen = len(payload)
         if WIRE_PROTOCOL_VERSION != '1.0' and not force_mavlink1:
             # in MAVLink2 we can strip trailing zeros off payloads. This allows for simple
@@ -207,7 +209,7 @@ class MAVLink_message(object):
         self._header  = MAVLink_header(self._header.msgId,
                                        incompat_flags=incompat_flags, compat_flags=0,
                                        mlen=len(self._payload), seq=mav.seq,
-                                       srcSystem=mav.srcSystem, srcComponent=mav.srcComponent)
+                                       srcSystem=srcSystem, srcComponent=srcComponent)
         self._msgbuf = self._header.pack(force_mavlink1=force_mavlink1) + self._payload
         crc = x25crc(self._msgbuf[1:])
         if ${crc_extra}: # using CRC extra
