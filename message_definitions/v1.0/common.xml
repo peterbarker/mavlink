@@ -2110,6 +2110,59 @@
                   <description>True if the EKF has detected a GPS glitch</description>
               </entry>
           </enum>
+
+          <enum name="MAV_COLLISION_ACTION">
+              <description>Possible actions an aircraft can take to avoid a collision.</description>
+              <entry value="0" name="MAV_COLLISION_ACTION_NONE">
+		  <description>Ignore any potential collisions</description>
+              </entry>
+              <entry value="1" name="MAV_COLLISION_ACTION_REPORT">
+		  <description>Report potential collision</description>
+              </entry>
+              <entry value="2" name="MAV_COLLISION_ACTION_VERTICAL_DESCEND">
+		  <description>Descend to avoid thread (or do not take off)</description>
+              </entry>
+              <entry value="3" name="MAV_COLLISION_ACTION_VERTICAL_ASCEND">
+		  <description>Ascend to avoid thread</description>
+              </entry>
+              <entry value="4" name="MAV_COLLISION_ACTION_TCAS">
+		  <description>Follow TCAS protocol</description>
+              </entry>
+              <entry value="5" name="MAV_COLLISION_ACTION_MOVE_PERPENDICULAR">
+		  <description>Aircraft to move perpendicular to the collision's velocity vector</description>
+              </entry>
+              <entry value="6" name="MAV_COLLISION_ACTION_RTL">
+		  <description>Aircraft to fly directly back to its launch point</description>
+              </entry>
+              <entry value="7" name="MAV_COLLISION_ACTION_HOVER">
+		  <description>Aircraft to stop in place</description>
+              </entry>
+              <entry value="8" name="MAV_COLLISION_ACTION_RETRACE_PATH">
+		  <description>Aircraft to return along path it has followed</description>
+              </entry>
+	  </enum>
+          <enum name="MAV_COLLISION_THREAT_LEVEL">
+              <description>Aircraft-rated danger from this threat.</description>
+              <entry value="0" name="MAV_COLLISION_THREAT_LEVEL_NONE">
+		  <description>Not a threat</description>
+              </entry>
+              <entry value="1" name="MAV_COLLISION_THREAT_LEVEL_LOW">
+		  <description>Craft is mildly concerned about this threat</description>
+              </entry>
+              <entry value="2" name="MAV_COLLISION_THREAT_LEVEL_HIGH">
+		  <description>Craft is panicing, and may take actions to avoid threat</description>
+              </entry>
+	  </enum>
+          <enum name="MAV_COLLISION_SRC">
+              <description>Source of information about this collision.</description>
+              <entry value="0" name="MAV_COLLISION_SRC_ADSB">
+		  <description>ID field references ADSB_VEHICLE packets</description>
+              </entry>
+              <entry value="1" name="MAV_COLLISION_SRC_MAVLINK_GPS_GLOBAL_INT">
+		  <description>ID field references MAVLink SRC ID</description>
+              </entry>
+	  </enum>
+
      </enums>
      <messages>
           <message id="0" name="HEARTBEAT">
@@ -3420,6 +3473,20 @@
           <field type="uint16_t" name="flags" enum="ADSB_FLAGS">Flags to indicate various statuses including valid data fields</field>
           <field type="uint16_t" name="squawk">Squawk code</field>
         </message>
+
+        <message id="247" name="COLLISION">
+          <description>Information about a potential collision</description>
+          <field type="uint8_t" name="collision_type" enum="COLLISION_TYPE">Collision type</field>
+          <field type="uint32_t" name="id">Unique identifier, domain based on COLLISION_TYPE</field>
+
+          <field type="uint8_t" name="action" enum="COLLISION_ACTION">Action that is being taken to avoid this collision</field>
+	  <field type="uint8_t" name="threat_level" enum="COLLISION_THREAT_LEVEL">How concerned the aircraft is about this collision</field>
+	  <field type="float" name="time_to_minimum_delta">Estimated time until this collision is realised (seconds)</field>
+	  <field type="float" name="minimum_delta_altitude">Closest vehicle will approach this collision (altitude, in metres)</field>
+	  <field type="float" name="minimum_delta_xy">Closest vehicle will approach this collision (horizontal distance, in metres)</field>
+        </message>
+
+
         <message id="248" name="V2_EXTENSION">
             <description>Message implementing parts of the V2 payload specs in V1 frames for transitional support.</description>
             <field type="uint8_t" name="target_network">Network ID (0 for broadcast)</field>
