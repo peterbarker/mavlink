@@ -1770,7 +1770,7 @@ class mavsource(mavfile):
 
     def send_wp(self, wp):
         '''send a wp message to a target system'''
-        wp.source_system = self.system
+        wp.target_system = self.system
         wp.target_component = self.component
         self.mav.send(wp)
 
