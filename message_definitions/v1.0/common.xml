@@ -3476,8 +3476,8 @@
 
         <message id="247" name="COLLISION">
           <description>Information about a potential collision</description>
-          <field type="uint8_t" name="collision_type" enum="COLLISION_TYPE">Collision type</field>
-          <field type="uint32_t" name="id">Unique identifier, domain based on COLLISION_TYPE</field>
+          <field type="uint8_t" name="src" enum="COLLISION_SRC">Collision data source</field>
+          <field type="uint32_t" name="id">Unique identifier, domain based on src field</field>
 
           <field type="uint8_t" name="action" enum="COLLISION_ACTION">Action that is being taken to avoid this collision</field>
 	  <field type="uint8_t" name="threat_level" enum="COLLISION_THREAT_LEVEL">How concerned the aircraft is about this collision</field>
