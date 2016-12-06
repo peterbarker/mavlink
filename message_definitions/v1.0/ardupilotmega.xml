@@ -1585,5 +1585,25 @@
       <field type="uint16_t[4]" name="count">count of telemetry packets received (wraps at 65535)</field>
     </message>
     
+    <message id="12001" name="LOG_FILTER_CLEAR">
+      <description>Remove log filtering</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+    </message>
+    <message id="12002" name="LOG_FILTER_ADD">
+      <description>Create a filter to use for subsequent log downloads.</description>
+      <field type="uint8_t" name="target_system">System ID</field>
+      <field type="uint8_t" name="target_component">Component ID</field>
+      <field enum="LOG_FILTER_CREATE_FLAGS" name="axis" type="uint8_t"></field>
+      <field name="seq" type="uint8_t">Filter fields sequence number</field>
+      <field type="char[128]" name="fields">comma-separated field names</field>
+    </message>
+    <message id="12003" name="LOG_FILTER">
+      <description>Announce filter currently being applied to downloaded log files.</description>
+      <field name="seq_count" type="uint8_t">Number of these messages required to assemble complete set</field>
+      <field name="seq" type="uint8_t">Filter fields sequence number, 0..(seq_count-1)</field>
+      <field type="char[128]" name="fields">comma-separated field names</field>
+    </message>
+
   </messages>
 </mavlink>
