@@ -1002,6 +1002,9 @@
       <entry value="1" name="VISION_POSITION_SLAM_RESET">
         <description>SLAM initialising</description>
       </entry>
+      <entry value="2" name="VISION_POSITION_ALIGNED_NED">
+        <description>True if the position estimate is aligned to the NED frame</description>
+      </entry>
     </enum>
   </enums>
   <messages>
@@ -1555,6 +1558,7 @@
     <message id="11012" name="VISION_POSITION_SLAM">
       <description>camera vision based attitude and position using SLAM</description>
       <field name="time_usec" type="uint64_t">Timestamp (microseconds, synced to UNIX time or since system boot)</field>
+      <field name="time_delta_usec" type="uint64_t">Time in microseconds since the last reported camera frame</field>
       <field name="att_reset_time_usec" type="uint64_t">Timestamp of the last attitude reset</field>
       <field name="pos_reset_time_usec" type="uint64_t">Timestamp of the last position reset</field>
       <field type="uint16_t" name="flags" enum="VISION_POSITION_SLAM_FLAGS" display="bitmask">Vision position slam flags (see VISION_POSITION_SLAM_FLAGS enum)</field>
@@ -1562,6 +1566,7 @@
       <field type="float[3]" name="position">Position in SLAM frame (X,Y,Z) expressed in meters offset from local origin</field>
       <field type="float" name="attitude_error">Attitude error estimate. 1-sigma spherical error (radians)</field>
       <field type="float" name="position_error">Position error estimate. 1-sigma spherical error (m)</field>
+      <field type="float" name="scale_factor">Scaling Factor (-1 if unknown)</field>
     </message>
     <!-- Angle of Attack and Side Slip Angle message -->
     <message id="11020" name="AOA_SSA">
