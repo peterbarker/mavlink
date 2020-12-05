@@ -873,6 +873,12 @@
       <entry value="1024" name="EKF_UNINITIALIZED">
         <description>Set if EKF has never been healthy.</description>
       </entry>
+      <entry value="16384" name="EKF_IS_PRIMARY">
+        <description>True if the core number supplied in the extension field is the primary core.</description>
+      </entry>
+      <entry value="32768" name="EKF_GPS_GLITCHING">
+        <description>True if GPS data is glitching.</description>
+      </entry>
     </enum>
     <enum name="PID_TUNING_AXIS">
       <entry value="1" name="PID_TUNING_ROLL"/>
@@ -1408,7 +1414,6 @@
     <message id="193" name="EKF_STATUS_REPORT">
       <description>EKF Status message including flags and variances.</description>
       <field type="uint16_t" name="flags" enum="EKF_STATUS_FLAGS" display="bitmask">Flags.</field>
-      <!-- supported flags see EKF_STATUS_FLAGS enum -->
       <field type="float" name="velocity_variance">Velocity variance.</field>
       <!-- below 0.5 is good, 0.5~0.79 is warning, 0.8 or higher is bad -->
       <field type="float" name="pos_horiz_variance">Horizontal Position variance.</field>
@@ -1417,6 +1422,7 @@
       <field type="float" name="terrain_alt_variance">Terrain Altitude variance.</field>
       <extensions/>
       <field type="float" name="airspeed_variance">Airspeed variance.</field>
+      <field type="uint8_t" name="core">Core this report applies to</field>
     </message>
     <!-- realtime PID tuning message -->
     <message id="194" name="PID_TUNING">
