@@ -728,6 +728,20 @@
       </entry>
       <entry value="4" name="AUTOTUNE_AXIS_YAW">
         <description>Autotune yaw axis.</description>
+    </enum>
+    <enum name="COMP_METADATA_TYPE">
+      <description>Possible values for COMPONENT_INFORMATION.comp_metadata_type.</description>
+      <entry value="0" name="COMP_METADATA_TYPE_GENERAL">
+        <description>General information which also includes information on other optional supported COMP_METADATA_TYPE's. Must be supported. Only downloadable from vehicle.</description>
+      </entry>
+      <entry value="1" name="COMP_METADATA_TYPE_PARAMETER">
+        <description>Parameter meta data.</description>
+      </entry>
+      <entry value="2" name="COMP_METADATA_TYPE_COMMANDS">
+        <description>Meta data which specifies the commands the vehicle supports. (WIP)</description>
+      </entry>
+      <entry value="3" name="COMP_METADATA_TYPE_PERIPHERALS">
+        <description>Meta data which specifies potential external peripherals that do not talk MAVLink</description>
       </entry>
     </enum>
     <!-- The MAV_CMD enum entries describe either: -->
@@ -6366,6 +6380,16 @@
       <field type="uint8_t" name="operation" enum="CAN_FILTER_OP">what operation to perform on the filter list. See CAN_FILTER_OP enum.</field>
       <field type="uint8_t" name="num_ids">number of IDs in filter list</field>
       <field type="uint16_t[16]" name="ids">filter IDs, length num_ids</field>
+    </message>
+    <message id="395" name="COMPONENT_INFORMATION">
+      <wip/>
+      <!-- This message is work-in-progress it can therefore change, and should NOT be used in stable production environments -->
+      <description>Information about a component. For camera components instead use CAMERA_INFORMATION, and for autopilots additionally use AUTOPILOT_VERSION. Components including GCSes should consider supporting requests of this message via MAV_CMD_REQUEST_MESSAGE.</description>
+      <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp (time since system boot).</field>
+      <field type="uint32_t" name="general_metadata_file_crc">CRC32 of the TYPE_GENERAL file (can be used by a GCS for file caching).</field>
+      <field type="char[100]" name="general_metadata_uri">Component definition URI for TYPE_GENERAL. This must be a MAVLink FTP URI and the file might be compressed with xz.</field>
+      <field type="uint32_t" name="peripherals_metadata_file_crc">CRC32 of the TYPE_PERIPHERALS file (can be used by a GCS for file caching).</field>
+      <field type="char[100]" name="peripherals_metadata_uri">(Optional) Component definition URI for TYPE_PERIPHERALS. This must be a MAVLink FTP URI and the file might be compressed with xz.</field>
     </message>
     <message id="410" name="EVENT">
       <wip/>
