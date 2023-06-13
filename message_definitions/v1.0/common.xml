@@ -1827,6 +1827,12 @@
         </description>
         <param index="1" label="System ID" minValue="0" maxValue="255" increment="1">Vehicle system id, this way ground station can request arm authorization on behalf of any vehicle</param>
       </entry>
+      <entry value="3002" name="MAV_CMD_SET_MINIMUM_MAV_STATE" hasLocation="false" isDestination="false">
+        <description>Set the minimum reported vehicle MAV_STATE, for example in the HEARTBEAT message.  This can be used by a GCS operator to indicate a vehicle is in trouble, even if the vehicle itself does not revognise this.  Minimum MAV_STATE is used to avoid setting the vehicle to report (e.g.) CRITICAL when the vehicle is currently in the (e.g.) EMERGENCY state.  No state above EMERGENCY should be allowed to be set.
+        </description>
+        <param index="1" label="MAV_STATE" minValue="0" maxValue="255" increment="1">Minimum MAV_STATE to report</param>
+        <param index="2" label="Unset" minValue="0" maxValue="1" increment="1">Remove previous setting of minimum MAV_STATE</param>
+      </entry>
       <entry value="4000" name="MAV_CMD_SET_GUIDED_SUBMODE_STANDARD" hasLocation="false" isDestination="false">
         <description>This command sets the submode to standard guided when vehicle is in guided mode. The vehicle holds position and altitude and the user can input the desired velocities along all three axes.
                   </description>
