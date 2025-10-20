@@ -263,5 +263,23 @@
       <field type="uint8_t" name="gnss_signal_quality" minValue="0" maxValue="10" invalid="UINT8_MAX">An abstract value representing the quality of incoming GNSS signals, or 255 if not available.</field>
       <field type="uint8_t" name="post_processing_quality" minValue="0" maxValue="10" invalid="UINT8_MAX">An abstract value representing the estimated PPK quality, or 255 if not available.</field>
     </message>
+    <message id="12930" name="IMU">
+      <description>IMU data for a single instance.</description>
+      <field type="uint8_t" name="id" instance="true">IMU ID</field>
+      <field type="float" name="xacc" units="m/s/s">X acceleration</field>
+      <field type="float" name="yacc" units="m/s/s">Y acceleration</field>
+      <field type="float" name="zacc" units="m/s/s">Z acceleration</field>
+      <field type="float" name="xgyro" units="rad/s">Angular speed around X axis</field>
+      <field type="float" name="ygyro" units="rad/s">Angular speed around Y axis</field>
+      <field type="float" name="zgyro" units="rad/s">Angular speed around Z axis</field>
+      <field type="int16_t" name="temperature" units="cdegC">Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C).</field>
+    </message>
+    <message id="12931" name="COMPASS">
+      <description>Compass data for a single instance.</description>
+      <field type="uint8_t" name="id" instance="true">Compass ID</field>
+      <field type="float" name="xmag" units="mgauss">X Magnetic field</field>
+      <field type="float" name="ymag" units="mgauss">Y Magnetic field</field>
+      <field type="float" name="zmag" units="mgauss">Z Magnetic field</field>
+    </message>
   </messages>
 </mavlink>
