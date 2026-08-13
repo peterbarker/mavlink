@@ -147,6 +147,16 @@
         <param index="6">Empty.</param>
         <param index="7">Empty.</param>
       </entry>
+      <entry value="42008" name="MAV_CMD_FORCE_SENSOR_CALIBRATE" hasLocation="false" isDestination="false">
+        <description>Calibrate a force sensor (load cell). Either zero the sensor with no load applied, or set its scale factor from a known mass which is currently applied to it. Zero the sensor before setting the scale factor. The vehicle must be disarmed. The result of the calibration is reported by STATUSTEXT.</description>
+        <param index="1" label="Instance" minValue="1" increment="1">Force sensor instance number.</param>
+        <param index="2" label="Operation" minValue="0" maxValue="1" increment="1">0: zero the sensor, with no load applied. 1: set the scale factor from the known mass in param 3.</param>
+        <param index="3" label="Mass" units="kg" minValue="0">Mass currently applied to the sensor. Only used when Operation is 1.</param>
+        <param index="4">Empty.</param>
+        <param index="5">Empty.</param>
+        <param index="6">Empty.</param>
+        <param index="7">Empty.</param>
+      </entry>
       <entry value="42424" name="MAV_CMD_DO_START_MAG_CAL" hasLocation="false" isDestination="false">
         <description>Initiate a magnetometer calibration.</description>
         <param index="1" label="Magnetometers Bitmask" minValue="0" maxValue="255" increment="1">Bitmask of magnetometers to calibrate. Use 0 to calibrate all sensors that can be started (sensors may not start if disabled, unhealthy, etc.). The command will NACK if calibration does not start for a sensor explicitly specified by the bitmask.</param>
