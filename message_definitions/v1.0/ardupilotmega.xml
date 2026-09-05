@@ -147,6 +147,16 @@
         <param index="6">Empty.</param>
         <param index="7">Empty.</param>
       </entry>
+      <entry value="42008" name="MAV_CMD_SET_MISSION_NUMBERING" hasLocation="false" isDestination="false">
+        <description>Set the sequence-number convention used for MAV_MISSION_TYPE_MISSION items on the link this command is received on. Affects mission upload and download, MISSION_CURRENT, MISSION_ITEM_REACHED, MISSION_SET_CURRENT, MAV_CMD_DO_SET_MISSION_CURRENT and the target of MAV_CMD_DO_JUMP. The setting is per-link and is not preserved across reboots, so a GCS should send this command each time it connects. A COMMAND_ACK result of MAV_RESULT_UNSUPPORTED means the autopilot only supports MISSION_NUMBERING_HOME_IS_ITEM_ZERO.</description>
+        <param index="1" label="Numbering" enum="MISSION_NUMBERING">Sequence-number convention to use on this link.</param>
+        <param index="2">Empty.</param>
+        <param index="3">Empty.</param>
+        <param index="4">Empty.</param>
+        <param index="5">Empty.</param>
+        <param index="6">Empty.</param>
+        <param index="7">Empty.</param>
+      </entry>
       <entry value="42424" name="MAV_CMD_DO_START_MAG_CAL" hasLocation="false" isDestination="false">
         <description>Initiate a magnetometer calibration.</description>
         <param index="1" label="Magnetometers Bitmask" minValue="0" maxValue="255" increment="1">Bitmask of magnetometers to calibrate. Use 0 to calibrate all sensors that can be started (sensors may not start if disabled, unhealthy, etc.). The command will NACK if calibration does not start for a sensor explicitly specified by the bitmask.</param>
@@ -311,6 +321,15 @@
         <param index="7">Empty</param>
       </entry>
       <!-- 43003 MAV_CMD_EXTERNAL_POSITION_ESTIMATE moved to common.xml -->
+    </enum>
+    <enum name="MISSION_NUMBERING">
+      <description>Sequence-number conventions for MAV_MISSION_TYPE_MISSION items. Selected per-link with MAV_CMD_SET_MISSION_NUMBERING.</description>
+      <entry value="0" name="MISSION_NUMBERING_HOME_IS_ITEM_ZERO">
+        <description>Item 0 of the mission is the vehicle's home position and the first mission command is item 1. This is the legacy ArduPilot convention and the default.</description>
+      </entry>
+      <entry value="1" name="MISSION_NUMBERING_STANDARD">
+        <description>Item 0 of the mission is the first mission command; the home position is not part of the mission. This is the convention described by the MAVLink mission protocol.</description>
+      </entry>
     </enum>
     <enum name="SCRIPTING_CMD">
       <entry value="0" name="SCRIPTING_CMD_REPL_START">
