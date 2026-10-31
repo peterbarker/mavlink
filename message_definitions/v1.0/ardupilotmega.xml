@@ -1710,7 +1710,7 @@
     <!-- 192 MAG_CAL_REPORT moved to common.xml -->
     <!-- EKF status message from autopilot to GCS. -->
     <message id="193" name="EKF_STATUS_REPORT">
-      <description>EKF Status message including flags and innovation test ratios. Despite their names, the *_variance fields are not variances: each is an innovation test ratio, |innovation| / (gate * sqrt(innovation variance)), with the same meaning as the corresponding ESTIMATOR_STATUS field. A value above 1.0 means the measurement is being rejected.</description>
+      <description>EKF Status message including flags and innovation test ratios. Despite their names, the *_variance fields are not variances. From an EKF, each is an innovation test ratio, |innovation| / (gate * sqrt(innovation variance)), with the same meaning as the corresponding ESTIMATOR_STATUS field, and a value above 1.0 means the measurement is being rejected. Other estimators (e.g. an external AHRS) may instead send a normalised accuracy on a similar scale, and 0 for values they don't estimate.</description>
       <field type="uint16_t" name="flags" enum="EKF_STATUS_FLAGS">Flags.</field>
       <!-- supported flags see EKF_STATUS_FLAGS enum -->
       <field type="float" name="velocity_variance">Velocity innovation test ratio.</field>
