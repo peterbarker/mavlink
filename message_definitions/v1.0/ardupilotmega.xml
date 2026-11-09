@@ -74,6 +74,31 @@
         <param index="6">Empty.</param>
         <param index="7">Empty.</param>
       </entry>
+      <!-- Flight corridor graph items, MAV_MISSION_TYPE_CORRIDOR (https://github.com/mavlink/mavlink/issues/2646) -->
+      <entry value="5110" name="MAV_CMD_NAV_CORRIDOR_NODE" hasLocation="true" isDestination="false">
+        <wip/>
+        <!-- This message is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
+        <description>Defines a node in a flight corridor graph (MAV_MISSION_TYPE_CORRIDOR). Nodes are referenced by their zero-based index in upload order, and all nodes precede all edges. The node is a sphere of the given radius around its location.</description>
+        <param index="1" label="Type" enum="MAV_CORRIDOR_NODE_TYPE">Node type.</param>
+        <param index="2" label="Radius" units="m" minValue="0">Radius of the sphere around the node that the vehicle may occupy. 0: unspecified (normal navigation tolerance).</param>
+        <param index="3">Reserved (set to 0)</param>
+        <param index="4">Reserved (set to 0)</param>
+        <param index="5" label="Latitude">Latitude of corridor node.</param>
+        <param index="6" label="Longitude">Longitude of corridor node.</param>
+        <param index="7" label="Altitude" units="m">Altitude of corridor node (AMSL).</param>
+      </entry>
+      <entry value="5111" name="MAV_CMD_NAV_CORRIDOR_EDGE" hasLocation="false" isDestination="false">
+        <wip/>
+        <!-- This message is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
+        <description>Defines a directed edge in a flight corridor graph (MAV_MISSION_TYPE_CORRIDOR) connecting two previously uploaded corridor nodes (MAV_CMD_NAV_CORRIDOR_NODE). Edges must follow all nodes and be sorted by Node From. The edge is a cylinder of the given radius around the segment between the two nodes.</description>
+        <param index="1" label="Node From" minValue="0" increment="1">Zero-based index of the source corridor node.</param>
+        <param index="2" label="Node To" minValue="0" increment="1">Zero-based index of the destination corridor node.</param>
+        <param index="3" label="Cost" minValue="0" default="0">Pre-computed static cost for this edge. 0: use the Euclidean distance between the nodes. Either all edges or no edges in a plan carry a cost.</param>
+        <param index="4" label="Radius" units="m" minValue="0">Radius of the cylinder around the segment between the two nodes that the vehicle may occupy. 0: unspecified (normal navigation tolerance).</param>
+        <param index="5">Reserved (set to 0)</param>
+        <param index="6">Reserved (set to 0)</param>
+        <param index="7">Reserved (set to 0)</param>
+      </entry>
       <entry value="42000" name="MAV_CMD_POWER_OFF_INITIATED" hasLocation="false" isDestination="false">
         <description>A system wide power-off event has been initiated.</description>
         <param index="1">Empty.</param>
@@ -311,6 +336,26 @@
         <param index="7">Empty</param>
       </entry>
       <!-- 43003 MAV_CMD_EXTERNAL_POSITION_ESTIMATE moved to common.xml -->
+    </enum>
+    <enum name="MAV_CORRIDOR_NODE_TYPE">
+      <description>Type of a corridor graph node, defining its role in routing.</description>
+      <entry value="0" name="MAV_CORRIDOR_NODE_TYPE_WAYPOINT">
+        <description>Intermediate routing node. Not a landing site.</description>
+      </entry>
+      <entry value="1" name="MAV_CORRIDOR_NODE_TYPE_NEST">
+        <description>Primary landing site (base). Intended as the preferred destination for a normal return.</description>
+      </entry>
+      <entry value="2" name="MAV_CORRIDOR_NODE_TYPE_DIVERT_SITE">
+        <description>Alternate landing site. Intended for use when a nest cannot be reached.</description>
+      </entry>
+      <entry value="3" name="MAV_CORRIDOR_NODE_TYPE_DITCH_SITE">
+        <description>Last-resort landing site where the airframe is considered expendable. Intended for use when no other landing site can be reached.</description>
+      </entry>
+    </enum>
+    <enum name="MAV_MISSION_TYPE">
+      <entry value="3" name="MAV_MISSION_TYPE_CORRIDOR">
+        <description>Specifies the flight corridor graph for the vehicle. Items are MAV_CMD_NAV_CORRIDOR_NODE and MAV_CMD_NAV_CORRIDOR_EDGE items.</description>
+      </entry>
     </enum>
     <enum name="SCRIPTING_CMD">
       <entry value="0" name="SCRIPTING_CMD_REPL_START">
